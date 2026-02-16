@@ -43,7 +43,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.extremesolution"
                 artifactId = "esupload"
-                version = "1.0.0"
+                version = "1.1.0"
 
                 pom {
                     name.set("esUpload")
@@ -99,4 +99,7 @@ dependencies {
 
     // LiveData (for observing upload state)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    // Core KTX (for NotificationCompat)
+    implementation(libs.androidx.core.ktx)
 }

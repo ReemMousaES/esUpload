@@ -1,9 +1,15 @@
 package com.extremesolution.esupload.worker
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.extremesolution.esupload.db.UploadDao
@@ -36,6 +42,9 @@ class FileUploadWorker @AssistedInject constructor(
         const val KEY_RESPONSE_BODY = "responseBody"
         const val KEY_ERROR_MESSAGE = "errorMessage"
         const val KEY_PROGRESS = "progress"
+
+        private const val NOTIFICATION_ID = 9001
+        private const val CHANNEL_ID = "esupload_channel"
 
         private val uploadMutex = Mutex()
     }
@@ -75,6 +84,7 @@ class FileUploadWorker @AssistedInject constructor(
 
         uploadDao.updateStatus(uploadId, UploadStatus.UPLOADING)
         setProgress(workDataOf(KEY_UPLOAD_ID to uploadId, KEY_PROGRESS to 0))
+        setForeground(createForegroundInfo(uploadId, 0))
 
         return try {
             val headers: Map<String, String> = gson.fromJson(
@@ -98,6 +108,7 @@ class FileUploadWorker @AssistedInject constructor(
             val progressBody = ProgressRequestBody(fileBody) { percent ->
                 uploadDao.updateProgress(uploadId, percent)
                 setProgress(workDataOf(KEY_UPLOAD_ID to uploadId, KEY_PROGRESS to percent))
+                setForeground(createForegroundInfo(uploadId, percent))
             }
             multipartBuilder.addFormDataPart(
                 entity.fileParamName,
@@ -166,6 +177,33 @@ class FileUploadWorker @AssistedInject constructor(
                     KEY_ERROR_MESSAGE to errorMessage
                 )
             )
+        }
+    }
+
+    private fun createForegroundInfo(uploadId: String, progress: Int): ForegroundInfo {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "File Uploads",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val nm = applicationContext.getSystemService(NotificationManager::class.java)
+            nm.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.stat_sys_upload)
+            .setContentTitle("Uploading file")
+            .setContentText("$progress%")
+            .setProgress(100, progress, false)
+            .setOngoing(true)
+            .setSilent(true)
+            .build()
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            ForegroundInfo(NOTIFICATION_ID, notification)
         }
     }
 }

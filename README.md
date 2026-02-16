@@ -6,7 +6,8 @@ A sequential file upload library for Android using WorkManager. Built by **Extre
 
 - **Sequential uploads** — files are uploaded one at a time via a `Mutex`, ensuring order and preventing server overload
 - **Automatic retries** — configurable retry count with exponential backoff
-- **Progress tracking** — real-time upload progress reported at 5% intervals via WorkManager's `setProgress()`
+- **Progress tracking** — real-time upload progress reported at 10% intervals via WorkManager's `setProgress()`
+- **Foreground notification** — persistent notification with progress bar (required for Android 12+)
 - **Persistent queue** — uploads survive process death using Room + WorkManager
 - **Hilt integration** — inject `EsUploadManager` anywhere in your app
 - **Network-aware** — uploads only run when a network connection is available
@@ -31,7 +32,7 @@ Add the dependency to your app-level `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.ReemMousaES:esUpload:1.0.0")
+    implementation("com.github.ReemMousaES:esUpload:1.1.0")
 }
 ```
 
@@ -75,6 +76,21 @@ In your `AndroidManifest.xml`:
         tools:node="remove" />
 </provider>
 ```
+
+### 4. Notification permission (Android 13+)
+
+On Android 13 (API 33) and above, you must request the `POST_NOTIFICATIONS` permission at runtime before uploads will show a notification:
+
+```kotlin
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE)
+}
+```
+
+The library automatically:
+- Creates a notification channel (`esupload_channel`) with low importance (no sound)
+- Shows a foreground notification with a progress bar during uploads
+- Removes the notification when the upload completes or fails
 
 ## Usage
 

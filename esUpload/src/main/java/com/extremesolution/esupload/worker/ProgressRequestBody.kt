@@ -39,8 +39,8 @@ class ProgressRequestBody(
             bytesWritten += byteCount
             if (totalBytes > 0) {
                 val percent = ((bytesWritten * 100) / totalBytes).toInt().coerceAtMost(100)
-                val bucket = percent / 5
-                val lastBucket = lastReportedPercent / 5
+                val bucket = percent / 10
+                val lastBucket = lastReportedPercent / 10
                 if (bucket != lastBucket || percent == 100) {
                     lastReportedPercent = percent
                     kotlinx.coroutines.runBlocking {
