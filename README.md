@@ -1,5 +1,5 @@
 # esUpload
-
+[![](https://jitpack.io/v/ReemMousaES/esUpload.svg)](https://jitpack.io/#ReemMousaES/esUpload)
 A sequential file upload library for Android using WorkManager. Built by **Extreme Solution**.
 
 ## Features
