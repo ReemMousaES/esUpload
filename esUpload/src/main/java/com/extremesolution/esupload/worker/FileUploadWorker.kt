@@ -160,6 +160,14 @@ class FileUploadWorker @AssistedInject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Upload $uploadId exception: ${e.message}", e)
             handleFailure(uploadId, entity.maxRetries, null, e.message ?: "Unknown error")
+        } finally {
+            // Always remove notification when work ends (success or failure)
+            try {
+                val notificationManager = applicationContext.getSystemService(NotificationManager::class.java)
+                notificationManager.cancel(NOTIFICATION_ID)
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not remove notification: ${e.message}")
+            }
         }
     }
 
