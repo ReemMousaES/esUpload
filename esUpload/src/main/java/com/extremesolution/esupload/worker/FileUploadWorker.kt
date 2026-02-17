@@ -57,8 +57,20 @@ class FileUploadWorker @AssistedInject constructor(
 
     private val gson = Gson()
 
-    override suspend fun doWork(): Result = uploadMutex.withLock {
-        doWorkInternal()
+    override suspend fun doWork(): Result {
+        // Start foreground service immediately to avoid ANR
+        val uploadId = inputData.getString(KEY_UPLOAD_ID)
+        if (uploadId != null) {
+            try {
+                setForeground(createForegroundInfo(uploadId, "Preparing upload...", "", 0))
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not set foreground immediately: ${e.message}")
+            }
+        }
+        
+        return uploadMutex.withLock {
+            doWorkInternal()
+        }
     }
 
     private suspend fun doWorkInternal(): Result {
@@ -85,10 +97,12 @@ class FileUploadWorker @AssistedInject constructor(
         uploadDao.updateStatus(uploadId, UploadStatus.UPLOADING)
         setProgress(workDataOf(KEY_UPLOAD_ID to uploadId, KEY_PROGRESS to 0))
         val displayFileName = entity.notificationFileName ?: file.name
+        
+        // Update foreground notification with actual upload details
         try {
             setForeground(createForegroundInfo(uploadId, entity.notificationTitle, displayFileName, 0))
         } catch (e: Exception) {
-            Log.w(TAG, "Could not set foreground (app may be backgrounded): ${e.message}")
+            Log.w(TAG, "Could not update foreground (app may be backgrounded): ${e.message}")
         }
 
         return try {
