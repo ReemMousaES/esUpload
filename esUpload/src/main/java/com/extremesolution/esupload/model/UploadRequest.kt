@@ -13,6 +13,8 @@ import com.google.gson.annotations.SerializedName
  * @param params Multipart form parameters sent alongside the file.
  * @param fileParamName The multipart parameter name for the file (default "file").
  * @param maxRetries Maximum number of retry attempts before marking as failed.
+ * @param notificationTitle Custom title for the upload notification (default "Uploading file").
+ * @param notificationFileName Custom filename to display in notification (null = use actual filename).
  */
 data class UploadRequest(
     @SerializedName("uploadId") val uploadId: String,
@@ -21,5 +23,7 @@ data class UploadRequest(
     @SerializedName("headers") val headers: Map<String, String> = emptyMap(),
     @SerializedName("params") val params: Map<String, String> = emptyMap(),
     @SerializedName("fileParamName") val fileParamName: String = "file",
-    @SerializedName("maxRetries") val maxRetries: Int = 5
+    @SerializedName("maxRetries") val maxRetries: Int = 5,
+    @SerializedName("notificationTitle") val notificationTitle: String = "Uploading file",
+    @SerializedName("notificationFileName") val notificationFileName: String? = null
 )

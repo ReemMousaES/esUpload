@@ -8,6 +8,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -69,6 +70,8 @@ class EsUploadManager @Inject constructor(
             paramsJson = gson.toJson(request.params),
             fileParamName = request.fileParamName,
             maxRetries = request.maxRetries,
+            notificationTitle = request.notificationTitle,
+            notificationFileName = request.notificationFileName,
             status = UploadStatus.QUEUED
         )
         uploadDao.insert(entity)
@@ -81,6 +84,7 @@ class EsUploadManager @Inject constructor(
                     .build()
             )
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, Duration.ofSeconds(10))
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .addTag(TAG_ALL_UPLOADS)
             .addTag("upload_${request.uploadId}")
             .build()
@@ -120,6 +124,7 @@ class EsUploadManager @Inject constructor(
                     .build()
             )
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, Duration.ofSeconds(10))
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .addTag(TAG_ALL_UPLOADS)
             .addTag("upload_$uploadId")
             .build()

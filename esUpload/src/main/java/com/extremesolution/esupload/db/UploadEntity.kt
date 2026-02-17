@@ -14,6 +14,8 @@ data class UploadEntity(
     val paramsJson: String = "{}",
     val fileParamName: String = "file",
     val maxRetries: Int = 5,
+    val notificationTitle: String = "Uploading file",
+    val notificationFileName: String? = null,
     val attemptCount: Int = 0,
     val status: UploadStatus = UploadStatus.QUEUED,
     val progress: Int = 0,

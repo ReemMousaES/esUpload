@@ -84,7 +84,12 @@ class FileUploadWorker @AssistedInject constructor(
 
         uploadDao.updateStatus(uploadId, UploadStatus.UPLOADING)
         setProgress(workDataOf(KEY_UPLOAD_ID to uploadId, KEY_PROGRESS to 0))
-        setForeground(createForegroundInfo(uploadId, 0))
+        val displayFileName = entity.notificationFileName ?: file.name
+        try {
+            setForeground(createForegroundInfo(uploadId, entity.notificationTitle, displayFileName, 0))
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not set foreground (app may be backgrounded): ${e.message}")
+        }
 
         return try {
             val headers: Map<String, String> = gson.fromJson(
@@ -108,7 +113,11 @@ class FileUploadWorker @AssistedInject constructor(
             val progressBody = ProgressRequestBody(fileBody) { percent ->
                 uploadDao.updateProgress(uploadId, percent)
                 setProgress(workDataOf(KEY_UPLOAD_ID to uploadId, KEY_PROGRESS to percent))
-                setForeground(createForegroundInfo(uploadId, percent))
+                try {
+                    setForeground(createForegroundInfo(uploadId, entity.notificationTitle, displayFileName, percent))
+                } catch (e: Exception) {
+                    // Silently ignore - notification will show when app comes to foreground
+                }
             }
             multipartBuilder.addFormDataPart(
                 entity.fileParamName,
@@ -180,7 +189,12 @@ class FileUploadWorker @AssistedInject constructor(
         }
     }
 
-    private fun createForegroundInfo(uploadId: String, progress: Int): ForegroundInfo {
+    private fun createForegroundInfo(
+        uploadId: String,
+        title: String,
+        fileName: String,
+        progress: Int
+    ): ForegroundInfo {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
@@ -193,8 +207,8 @@ class FileUploadWorker @AssistedInject constructor(
 
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_upload)
-            .setContentTitle("Uploading file")
-            .setContentText("$progress%")
+            .setContentTitle(title)
+            .setContentText("$fileName • $progress%")
             .setProgress(100, progress, false)
             .setOngoing(true)
             .setSilent(true)

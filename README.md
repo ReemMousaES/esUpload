@@ -32,7 +32,7 @@ Add the dependency to your app-level `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.ReemMousaES:esUpload:1.1.0")
+    implementation("com.github.ReemMousaES:esUpload:1.2.1")
 }
 ```
 
@@ -89,8 +89,21 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
 The library automatically:
 - Creates a notification channel (`esupload_channel`) with low importance (no sound)
-- Shows a foreground notification with a progress bar during uploads
+- Shows a foreground notification with a progress bar during uploads (when app is foregrounded)
+- Uses expedited work to avoid crashes on Android 12+ when the app is backgrounded
 - Removes the notification when the upload completes or fails
+
+### Custom notification text
+
+You can customize the notification title and filename:
+
+```kotlin
+UploadRequest(
+    // ... other fields
+    notificationTitle = "Uploading photo",
+    notificationFileName = "vacation.jpg" // null = use actual filename
+)
+```
 
 ## Usage
 
@@ -107,7 +120,9 @@ esUploadManager.enqueue(
         url = "https://api.example.com/upload",
         headers = mapOf("Authorization" to "Bearer token"),
         params = mapOf("eventId" to "evt_1"),
-        fileParamName = "photo"
+        fileParamName = "photo",
+        notificationTitle = "Uploading photo",
+        notificationFileName = "vacation.jpg"
     )
 )
 ```
