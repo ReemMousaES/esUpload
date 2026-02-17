@@ -19,6 +19,7 @@ object EsUploadModule {
     @Singleton
     fun provideUploadDatabase(@ApplicationContext context: Context): UploadDatabase =
         Room.databaseBuilder(context, UploadDatabase::class.java, "es_upload_queue_db")
+            .addMigrations(UploadDatabase.MIGRATION_1_2)
             .build()
 
     @Provides

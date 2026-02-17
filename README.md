@@ -32,7 +32,7 @@ Add the dependency to your app-level `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.ReemMousaES:esUpload:1.2.1")
+    implementation("com.github.ReemMousaES:esUpload:1.2.2")
 }
 ```
 
