@@ -32,7 +32,7 @@ Add the dependency to your app-level `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.ReemMousaES:esUpload:1.2.2")
+    implementation("com.github.ReemMousaES:esUpload:1.2.4")
 }
 ```
 
@@ -89,21 +89,24 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
 The library automatically:
 - Creates a notification channel (`esupload_channel`) with low importance (no sound)
-- Shows a foreground notification with a progress bar during uploads (when app is foregrounded)
+- Starts foreground service immediately (within 5 seconds) to prevent ANR crashes
+- Shows "Preparing upload..." notification initially, then updates with actual progress
 - Uses expedited work to avoid crashes on Android 12+ when the app is backgrounded
-- Removes the notification when the upload completes or fails
+- Automatically removes the notification when the upload completes or fails
 
 ### Custom notification text
 
-You can customize the notification title and filename:
+You can customize the notification title and filename displayed during upload:
 
 ```kotlin
 UploadRequest(
     // ... other fields
-    notificationTitle = "Uploading photo",
-    notificationFileName = "vacation.jpg" // null = use actual filename
+    notificationTitle = "Uploading photo",      // Custom title (default: "Uploading file")
+    notificationFileName = "vacation.jpg"       // Custom filename (default: actual filename)
 )
 ```
+
+The notification will display: **"Uploading photo • vacation.jpg • 45%"**
 
 ## Usage
 
@@ -175,6 +178,44 @@ esUploadManager.deleteAllFailed()
 | `observePending()` | Observe non-completed uploads |
 | `observeCountByStatus(status)` | Observe count by status |
 | `observeWorkInfo()` | Observe WorkManager work info |
+
+## Changelog
+
+### v1.2.4 (Latest)
+- **Fix**: Start foreground service immediately to prevent ANR crashes
+- Shows "Preparing upload..." notification within 5 seconds to meet Android requirements
+- Prevents `ForegroundServiceStartNotAllowedException` on Android 12+
+
+### v1.2.3
+- **Fix**: Automatically remove notification when upload completes
+- Prevents 100% notification from staying in notification bar
+
+### v1.2.2
+- **Fix**: Add Room database migration for notification columns
+- Prevents schema mismatch crashes when upgrading from v1.1.0
+
+### v1.2.1
+- **Feature**: Customizable notification title and filename
+- **Feature**: Expedited work support for Android 12+ background compatibility
+- Wrapped `setForeground()` calls in try-catch to prevent crashes
+
+### v1.1.0
+- **Feature**: Foreground notification with progress bar
+- Required for Android 12+ to prevent background work from being killed
+- Progress updates every 10% (configurable)
+
+### v1.0.0
+- Initial release
+- Sequential file uploads with WorkManager
+- Automatic retries with exponential backoff
+- Room database for persistent queue
+
+## Requirements
+
+- **Android**: API 24+ (Android 7.0)
+- **Kotlin**: 1.9+
+- **Hilt**: 2.48+
+- **WorkManager**: 2.8+
 
 ## License
 
