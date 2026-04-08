@@ -57,6 +57,11 @@ class FileUploadWorker @AssistedInject constructor(
 
     private val gson = Gson()
 
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        val uploadId = inputData.getString(KEY_UPLOAD_ID) ?: "unknown"
+        return createForegroundInfo(uploadId, "Upload", "Preparing...", 0)
+    }
+
     override suspend fun doWork(): Result {
         // Start foreground service immediately to avoid ANR
         val uploadId = inputData.getString(KEY_UPLOAD_ID)
