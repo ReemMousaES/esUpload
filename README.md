@@ -229,6 +229,14 @@ esUploadManager.deleteAllFailed()
 - **Hilt**: 2.60+ recommended (match the library's Hilt version)
 - **WorkManager**: 2.12+
 
+## Running tests
+
+```bash
+./gradlew :esUpload:testDebugUnitTest
+```
+
+Unit tests run on the JVM with Robolectric and cover the upload worker (against a local MockWebServer), the queue manager, the Room DAO, the v1→v2 database migration and progress reporting.
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.

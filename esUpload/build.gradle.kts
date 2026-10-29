@@ -22,6 +22,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            // Robolectric's SDK 36 runtime reads FileDescriptor internals through jdk.internal.access
+            it.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
+        }
+    }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -103,4 +111,15 @@ dependencies {
 
     // Core KTX (for NotificationCompat)
     implementation(libs.androidx.core.ktx)
+
+    // Unit tests (JVM + Robolectric)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core.ktx)
+    testImplementation(libs.androidx.test.ext.junit.ktx)
+    testImplementation(libs.androidx.arch.core.testing)
+    testImplementation(libs.androidx.work.testing)
+    testImplementation(platform(libs.kotlinx.coroutines.bom))
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver3)
 }
