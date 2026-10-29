@@ -1,8 +1,7 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     `maven-publish`
@@ -10,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.extremesolution.esupload"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -23,16 +22,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-
     publishing {
         singleVariant("release") {
             withSourcesJar()
         }
+    }
+}
+
+// Keep Kotlin metadata readable by consumers on Kotlin 2.1+
+kotlin {
+    compilerOptions {
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
     }
 }
 
@@ -43,7 +44,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.extremesolution"
                 artifactId = "esupload"
-                version = "1.2.6"
+                version = "1.3.0"
 
                 pom {
                     name.set("esUpload")
