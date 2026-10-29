@@ -1,8 +1,7 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     `maven-publish`
@@ -10,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.extremesolution.esupload"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -23,9 +22,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            // Robolectric's SDK 36 runtime reads FileDescriptor internals through jdk.internal.access
+            it.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
         }
     }
 
@@ -36,6 +37,14 @@ android {
     }
 }
 
+// Keep Kotlin metadata readable by consumers on Kotlin 2.1+
+kotlin {
+    compilerOptions {
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+    }
+}
+
 afterEvaluate {
     publishing {
         publications {
@@ -43,7 +52,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.extremesolution"
                 artifactId = "esupload"
-                version = "1.2.6"
+                version = "1.3.0"
 
                 pom {
                     name.set("esUpload")
@@ -102,4 +111,15 @@ dependencies {
 
     // Core KTX (for NotificationCompat)
     implementation(libs.androidx.core.ktx)
+
+    // Unit tests (JVM + Robolectric)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core.ktx)
+    testImplementation(libs.androidx.test.ext.junit.ktx)
+    testImplementation(libs.androidx.arch.core.testing)
+    testImplementation(libs.androidx.work.testing)
+    testImplementation(platform(libs.kotlinx.coroutines.bom))
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver3)
 }

@@ -155,7 +155,7 @@ class FileUploadWorker @AssistedInject constructor(
             Log.d(TAG, "Uploading $uploadId to ${entity.url} with params: $params")
 
             val response = client.newCall(requestBuilder.build()).execute()
-            val responseBody = response.body?.string() ?: ""
+            val responseBody = response.body.string()
             val responseCode = response.code
 
             Log.d(TAG, "Upload $uploadId response: code=$responseCode, body=$responseBody")

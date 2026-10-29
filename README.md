@@ -32,7 +32,7 @@ Add the dependency to your app-level `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.ReemMousaES:esUpload:1.2.4")
+    implementation("com.github.ReemMousaES:esUpload:1.3.0")
 }
 ```
 
@@ -181,7 +181,19 @@ esUploadManager.deleteAllFailed()
 
 ## Changelog
 
-### v1.2.4 (Latest)
+### v1.3.0 (Latest)
+- **Build**: AGP 9.5 with built-in Kotlin, Gradle 9.8, compileSdk 36
+- **Dependencies**: WorkManager 2.12, Room 2.8.5, Hilt 2.60.1, AndroidX Hilt 1.4, OkHttp 5.4, Coroutines 1.11, Lifecycle 2.11, Core 1.18
+- Library is compiled at Kotlin language level 2.2, so apps on Kotlin 2.1+ can consume it
+- **Breaking**: consuming apps must compile against SDK 36 or later
+
+### v1.2.6
+- **Fix**: Implement `getForegroundInfo()` for Android 11+ compatibility
+
+### v1.2.5
+- **Feature**: Log request params when an upload starts
+
+### v1.2.4
 - **Fix**: Start foreground service immediately to prevent ANR crashes
 - Shows "Preparing upload..." notification within 5 seconds to meet Android requirements
 - Prevents `ForegroundServiceStartNotAllowedException` on Android 12+
@@ -212,10 +224,18 @@ esUploadManager.deleteAllFailed()
 
 ## Requirements
 
-- **Android**: API 24+ (Android 7.0)
-- **Kotlin**: 1.9+
-- **Hilt**: 2.48+
-- **WorkManager**: 2.8+
+- **Android**: API 24+ (Android 7.0), compileSdk 36+
+- **Kotlin**: 2.1+
+- **Hilt**: 2.60+ recommended (match the library's Hilt version)
+- **WorkManager**: 2.12+
+
+## Running tests
+
+```bash
+./gradlew :esUpload:testDebugUnitTest
+```
+
+Unit tests run on the JVM with Robolectric and cover the upload worker (against a local MockWebServer), the queue manager, the Room DAO, the v1→v2 database migration and progress reporting.
 
 ## License
 

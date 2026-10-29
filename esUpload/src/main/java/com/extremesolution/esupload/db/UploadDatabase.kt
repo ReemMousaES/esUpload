@@ -11,11 +11,11 @@ abstract class UploadDatabase : RoomDatabase() {
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
                     "ALTER TABLE upload_queue ADD COLUMN notificationTitle TEXT NOT NULL DEFAULT 'Uploading file'"
                 )
-                database.execSQL(
+                db.execSQL(
                     "ALTER TABLE upload_queue ADD COLUMN notificationFileName TEXT"
                 )
             }
