@@ -52,7 +52,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.extremesolution"
                 artifactId = "esupload"
-                version = "1.3.0"
+                version = "1.3.1"
 
                 pom {
                     name.set("esUpload")
