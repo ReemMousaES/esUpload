@@ -182,7 +182,7 @@ esUploadManager.deleteAllFailed()
 ## Changelog
 
 ### v1.3.0 (Latest)
-- **Build**: AGP 9.5 with built-in Kotlin, Gradle 9.8, compileSdk 36
+- **Build**: AGP 9.3 with built-in Kotlin, Gradle 9.8, compileSdk 36
 - **Dependencies**: WorkManager 2.12, Room 2.8.5, Hilt 2.60.1, AndroidX Hilt 1.4, OkHttp 5.4, Coroutines 1.11, Lifecycle 2.11, Core 1.18
 - Library is compiled at Kotlin language level 2.2, so apps on Kotlin 2.1+ can consume it
 - **Breaking**: consuming apps must compile against SDK 36 or later
